@@ -1,7 +1,8 @@
 package snake
 
 type Food struct {
-	x, y int
+	x int
+	y int
 }
 
 func NewFood(x, y int) *Food {

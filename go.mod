@@ -2,7 +2,7 @@ module github.com/yushengguo557/snake
 
 go 1.20
 
-require github.com/hajimehoshi/ebiten/v2 v2.4.17
+require github.com/hajimehoshi/ebiten/v2 v2.4.18
 
 require (
 	github.com/ebitengine/purego v0.0.0-20220905075623-aeed57cda744 // indirect

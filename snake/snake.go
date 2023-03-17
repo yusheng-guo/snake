@@ -2,16 +2,17 @@ package snake
 
 import "github.com/hajimehoshi/ebiten/v2"
 
-type Coord struct {
+type Coord struct { // 组成射的每一个小方块
 	x, y int
 }
 
 type Snake struct {
-	body      []Coord
-	direction ebiten.Key
-	justAte   bool
+	body      []Coord    // 身体
+	direction ebiten.Key //方向
+	justEat   bool
 }
 
+// NewSnake 创建🐍
 func NewSnake(body []Coord, direction ebiten.Key) *Snake {
 	return &Snake{
 		body:      body,
@@ -19,10 +20,13 @@ func NewSnake(body []Coord, direction ebiten.Key) *Snake {
 	}
 }
 
+// Head 🐍头
 func (s *Snake) Head() Coord {
 	return s.body[len(s.body)-1]
 }
 
+// ChangeDirection 改变🐍的方向
+// 不允许将方向修改为原方向的相反方向
 func (s *Snake) ChangeDirection(newDir ebiten.Key) {
 	opposites := map[ebiten.Key]ebiten.Key{
 		ebiten.KeyArrowUp:    ebiten.KeyArrowDown,
@@ -30,50 +34,51 @@ func (s *Snake) ChangeDirection(newDir ebiten.Key) {
 		ebiten.KeyArrowDown:  ebiten.KeyArrowUp,
 		ebiten.KeyArrowLeft:  ebiten.KeyArrowRight,
 	}
-
-	// don't allow changing direction to opposite
-	if o, ok := opposites[newDir]; ok && o != s.direction {
+	if d, ok := opposites[newDir]; ok && d != s.direction {
 		s.direction = newDir
 	}
 }
 
+// 碰撞检测
+// HeadHits 检测🐍头是否在(x, y)
+// 是否撞墙 是否吃到食物
 func (s *Snake) HeadHits(x, y int) bool {
-	h := s.Head()
-
-	return h.x == x && h.y == y
+	head := s.Head()
+	return head.x == x && head.y == y
 }
 
+// HeadHits 检测🐍头是否碰撞🐍身
 func (s *Snake) HeadHitsBody() bool {
-	h := s.Head()
+	head := s.Head()
 	bodyWithoutHead := s.body[:len(s.body)-1]
-
 	for _, b := range bodyWithoutHead {
-		if b.x == h.x && b.y == h.y {
+		if b.x == head.x && b.y == head.y {
 			return true
 		}
 	}
-
 	return false
 }
 
+// Move 🐍移动
 func (s *Snake) Move() {
-	h := s.Head()
-	newHead := Coord{x: h.x, y: h.y}
-
+	head := s.Head() // 🐍头
+	newHead := Coord{
+		x: head.x,
+		y: head.y,
+	}
 	switch s.direction {
-	case ebiten.KeyArrowUp:
-		newHead.x--
-	case ebiten.KeyArrowRight:
-		newHead.y++
 	case ebiten.KeyArrowDown:
 		newHead.x++
+	case ebiten.KeyArrowUp:
+		newHead.x--
 	case ebiten.KeyArrowLeft:
 		newHead.y--
+	case ebiten.KeyArrowRight:
+		newHead.y++
 	}
-
-	if s.justAte {
+	if s.justEat {
 		s.body = append(s.body, newHead)
-		s.justAte = false
+		s.justEat = false
 	} else {
 		s.body = append(s.body[1:], newHead)
 	}
