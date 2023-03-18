@@ -11,18 +11,18 @@ func NewInput() *Input {
 	return &Input{}
 }
 
-func (i *Input) Dir(ebiten.Key) (ebiten.Key, bool) {
-	if inpututil.IsKeyJustPressed(ebiten.KeyUp) {
-		return ebiten.KeyUp, true
+func (i *Input) Dir() (ebiten.Key, bool) {
+	if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
+		return ebiten.KeyArrowUp, true
 	}
-	if inpututil.IsKeyJustPressed((ebiten.KeyDown)) {
-		return ebiten.KeyDown, true
+	if inpututil.IsKeyJustPressed((ebiten.KeyArrowDown)) {
+		return ebiten.KeyArrowDown, true
 	}
-	if inpututil.IsKeyJustPressed((ebiten.KeyLeft)) {
-		return ebiten.KeyLeft, true
+	if inpututil.IsKeyJustPressed((ebiten.KeyArrowLeft)) {
+		return ebiten.KeyArrowLeft, true
 	}
-	if inpututil.IsKeyJustPressed((ebiten.KeyRight)) {
-		return ebiten.KeyRight, true
+	if inpututil.IsKeyJustPressed((ebiten.KeyArrowRight)) {
+		return ebiten.KeyArrowRight, true
 	}
 	return 0, false
 }
