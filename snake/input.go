@@ -26,3 +26,11 @@ func (i *Input) Dir() (ebiten.Key, bool) {
 	}
 	return 0, false
 }
+
+func (i *Input) isPressSpace() bool {
+	return inpututil.IsKeyJustPressed(ebiten.KeySpace)
+}
+
+func (i *Input) isPressR() bool {
+	return inpututil.IsKeyJustPressed(ebiten.KeyR)
+}

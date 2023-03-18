@@ -41,7 +41,7 @@ func (s *Snake) ChangeDirection(newDir ebiten.Key) {
 
 // 碰撞检测
 // HeadHits 检测🐍头是否在(x, y)
-// 是否撞墙 是否吃到食物
+// 是否吃到食物
 func (s *Snake) HeadHits(x, y int) bool {
 	head := s.Head()
 	return head.x == x && head.y == y
@@ -68,13 +68,13 @@ func (s *Snake) Move() {
 	}
 	switch s.direction {
 	case ebiten.KeyArrowDown:
-		newHead.x++
-	case ebiten.KeyArrowUp:
-		newHead.x--
-	case ebiten.KeyArrowLeft:
-		newHead.y--
-	case ebiten.KeyArrowRight:
 		newHead.y++
+	case ebiten.KeyArrowUp:
+		newHead.y--
+	case ebiten.KeyArrowLeft:
+		newHead.x--
+	case ebiten.KeyArrowRight:
+		newHead.x++
 	}
 	if s.justEat {
 		s.body = append(s.body, newHead)
