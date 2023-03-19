@@ -8,13 +8,13 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
 )
 
-//go:embed ..\assets\paddle.ogg
+//go:embed ..\assets\audios\paddle.ogg
 var paddleOgg []byte
 
-//go:embed ..\assets\score.ogg
+//go:embed ..\assets\audios\score.ogg
 var scoreOgg []byte
 
-//go:embed ..\assets\wall.ogg
+//go:embed ..\assets\audios\wall.ogg
 var wallOgg []byte
 
 type Sound struct {

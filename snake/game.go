@@ -14,7 +14,7 @@ const (
 	boardRows    = 14
 	coordWidth   = ScreenWidth / boardCols       // 每个小方块的宽度
 	coordHeight  = ScreenHeight / boardRows      // 每个小方块的高度
-	fontSize     = 20                            // 字体大小
+	fontSize     = 25                            // 字体大小
 	name         = "assets/background music.mp3" // 背景音乐
 	sampleRate   = 48000                         // 码率
 )
@@ -52,11 +52,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	if !g.board.gameStart { // 游戏开始界面
 		g.board.DisplayStartScreen(screen, face)
 	} else if g.board.gameOver { // 游戏结束 显示分数
-		g.board.DisplayOverScreen(screen, g.board.scores, face)
+		g.board.DisplayOverScreen(screen, g.board.score, face)
 	} else {
-		g.board.DisplaySnake(screen)                       // 画🐍身
-		g.board.DisplayFood(screen)                        // 画食物
-		g.board.DisplayScore(screen, g.board.scores, face) // 实时分数
+		g.board.DisplaySnake(screen)                      // 画🐍身
+		g.board.DisplayFoods(screen)                      // 画食物
+		g.board.DisplayScore(screen, g.board.score, face) // 实时分数
 	}
 }
 

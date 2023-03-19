@@ -9,17 +9,18 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text"
+	"golang.org/x/exp/slices"
 	"golang.org/x/image/font"
 )
 
 type Board struct {
-	rows      int    // 行
-	cols      int    // 列
-	food      *Food  // 食物
-	snake     *Snake // 🐍
-	scores    int    // 分数
-	gameStart bool   // 游戏开始
-	gameOver  bool   // 游戏结束
+	rows      int     // 行
+	cols      int     // 列
+	foods     []*Food // 食物
+	snake     *Snake  // 🐍
+	score     int     // 分数
+	gameStart bool    // 游戏开始
+	gameOver  bool    // 游戏结束
 	timer     time.Time
 }
 
@@ -33,7 +34,7 @@ func NewBoard(rows, cols int) *Board {
 		gameOver:  false,
 	}
 	b.snake = NewSnake([]Coord{{0, 0}, {1, 0}, {2, 0}, {3, 0}}, ebiten.KeyArrowRight)
-	b.placeFood() // 放食物
+	b.placeFoods(5) // 放食物
 	return b
 }
 
@@ -57,6 +58,7 @@ func (b *Board) DrawGrid(screen *ebiten.Image) {
 func (b *Board) Update(i *Input) error {
 	// 游戏开始
 	if ok := i.isPressSpace(); ok {
+		b.score = 0
 		b.gameStart = true
 	}
 	// 重新开始
@@ -90,11 +92,14 @@ func (b *Board) Update(i *Input) error {
 
 // DisplayStartScreen 在screen上展示游戏开始界面
 func (b *Board) DisplayStartScreen(screen *ebiten.Image, face font.Face) {
+	message := "Press the \"space\" key to start the game!\n"
+	size := text.BoundString(face, message)
+	messageWidth, messageHeight := size.Max.X-size.Min.X, size.Max.Y-size.Min.Y
 	text.Draw(
 		screen,
-		"Press the space key to start the game!\n",
+		message,
 		face,
-		ScreenWidth/2-fontSize*8, ScreenHeight/2,
+		(ScreenWidth-messageWidth)/2, (ScreenHeight-messageHeight)/2,
 		color.Black,
 	)
 }
@@ -112,13 +117,15 @@ func (b *Board) DisplayScore(screen *ebiten.Image, score int, face font.Face) {
 
 // DisplayOverScreen 在screen上展示游结束界面
 func (b *Board) DisplayOverScreen(screen *ebiten.Image, score int, face font.Face) {
+	message := "Game Over.\n" + fmt.Sprintf("Score: %d\n", score) + "Press R to restart the game.\n"
+	size := text.BoundString(face, message)
+	messageWidth, messageHeight := size.Max.X-size.Min.X, size.Max.Y-size.Min.Y
 	text.Draw(
 		screen,
-		fmt.Sprintf("Game Over. Score: %d\n", score)+
-			"Press R to restart the game.\n",
+		message,
 		face,
-		ScreenWidth/2-fontSize*8, ScreenHeight/2,
-		color.Black,
+		(ScreenWidth-messageWidth)/2, (ScreenHeight-messageHeight)/2,
+		color.RGBA{220, 20, 60, 255},
 	)
 }
 
@@ -129,39 +136,53 @@ func (b *Board) DisplaySnake(screen *ebiten.Image) {
 		if i == len(b.snake.body)-1 {
 			snakeColor = snakeHeadColor
 		}
-		ebitenutil.DrawRect(screen, float64(p.x*coordWidth)+float64(coordWidth*1/20), float64(p.y*coordHeight)+float64(coordHeight*1/20), float64(coordWidth)*9/10, float64(coordHeight)*9/10, snakeColor)
+		// ebitenutil.DrawRect(screen, float64(p.x*coordWidth)+float64(coordWidth*1/20), float64(p.y*coordHeight)+float64(coordHeight*1/20), float64(coordWidth)*9/10, float64(coordHeight)*9/10, snakeColor)
+		ebitenutil.DrawCircle(
+			screen,
+			float64(p.x*coordWidth)+float64(coordWidth/2), float64(p.y*coordHeight)+float64(coordHeight/2),
+			float64(coordWidth/2),
+			snakeColor,
+		)
 	}
 }
 
 // DisplayFood 画食物
-func (b *Board) DisplayFood(screen *ebiten.Image) {
-	foodImg := b.food.image
+func (b *Board) DisplayFoods(screen *ebiten.Image) {
+	for _, f := range b.foods {
+		b.displayFood(screen, f)
+	}
+}
+
+func (b *Board) displayFood(screen *ebiten.Image, food *Food) {
+	foodImg := food.image
 	op := &ebiten.DrawImageOptions{}
 	sx, sy := foodImg.Size()
 	propx := float64(coordWidth) / float64(sy)
 	propy := float64(coordHeight) / float64(sx)
 	op.GeoM.Scale(propx, propy)
-	op.GeoM.Translate(float64(b.food.x*coordWidth), float64(b.food.y*coordHeight))
+	op.GeoM.Translate(float64(food.x*coordWidth), float64(food.y*coordHeight))
 	screen.DrawImage(foodImg, op)
 }
 
-// placeFood 放置食物
-func (b *Board) placeFood() {
+// placeFoods 放置n个食物
+func (b *Board) placeFoods(n int) {
 	var x, y int
-	for {
-		x = rand.Intn(b.cols)
-		y = rand.Intn(b.rows)
-		on := false // 食物是否在🐍上
-		for _, v := range b.snake.body {
-			if x == v.x && y == v.y {
-				on = true
+	for i := 0; i < n; i++ {
+		for {
+			x = rand.Intn(b.cols)
+			y = rand.Intn(b.rows)
+			on := false // 食物是否在🐍上
+			for _, v := range b.snake.body {
+				if x == v.x && y == v.y {
+					on = true
+				}
+			}
+			if !on && !b.snake.HeadHits(x, y) {
+				break
 			}
 		}
-		if !on && !b.snake.HeadHits(x, y) {
-			break
-		}
+		b.foods = append(b.foods, NewFood(x, y))
 	}
-	b.food = NewFood(x, y)
 }
 
 // moveSnake 移动🐍
@@ -174,13 +195,24 @@ func (b *Board) moveSnake() error {
 		b.gameOver = true
 		return nil
 	}
-	if b.snake.HeadHits(b.food.x, b.food.y) {
-		if paddle, ok := b.snake.sounds["paddle"]; ok { // 吃到食物音效
-			paddle.Play()
+	for _, f := range b.foods {
+		if b.snake.HeadHits(f.x, f.y) {
+			if paddle, ok := b.snake.sounds["paddle"]; ok { // 吃到食物音效
+				paddle.Play()
+			}
+			// 更新食物链
+			index := slices.IndexFunc(b.foods, func(f *Food) bool {
+				return f.x == b.snake.Head().x && f.y == b.snake.Head().y
+			})
+			if index == len(b.foods)-1 {
+				b.foods = b.foods[:index]
+			} else {
+				b.foods = append(b.foods[:index], b.foods[index+1:]...)
+			}
+			b.snake.justEat = true // 是否吃到食物
+			b.placeFoods(1)        // 放食物
+			b.score++              // 分数
 		}
-		b.snake.justEat = true // 是否吃到食物
-		b.placeFood()          // 放食物
-		b.scores++             // 分数
 	}
 	return nil
 }
