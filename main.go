@@ -15,7 +15,7 @@ func main() {
 	ebiten.SetWindowTitle("Snake")
 	var icon image.Image
 	var err error
-	if _, icon, err = ebitenutil.NewImageFromFile("icon.png"); err != nil {
+	if _, icon, err = ebitenutil.NewImageFromFile("asserts/icon.png"); err != nil {
 		log.Fatal(err)
 	}
 	ebiten.SetWindowIcon([]image.Image{icon})

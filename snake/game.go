@@ -5,14 +5,16 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 const (
 	ScreenWidth  = 600
-	ScreenHeight = 600
-	boardRows    = 20
+	ScreenHeight = 420
 	boardCols    = 20
+	boardRows    = 14
+	coordWidth   = ScreenWidth / boardCols  // 每个小方块的宽度
+	coordHeight  = ScreenHeight / boardRows // 每个小方块的高度
+	fontSize     = 20                       // 字体大小
 )
 
 var (
@@ -38,34 +40,19 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	screen.Fill(backgroundColor)
+	screen.Fill(backgroundColor)    // 填充背景
+	face, err := loadFont(fontSize) // 字体
+	if err != nil {
+		log.Fatal(err)
+	}
 	if !g.board.gameStart { // 游戏开始界面
-		g.board.DisplayStartScreen(screen)
+		g.board.DisplayStartScreen(screen, face)
 	} else if g.board.gameOver { // 游戏结束 显示分数
-		g.board.DisplayOverScreen(screen, g.board.scores)
+		g.board.DisplayOverScreen(screen, g.board.scores, face)
 	} else {
-		width := ScreenHeight / boardRows
-		// 画🐍身
-		snakeColor := snakeBodyColor
-		for i, p := range g.board.snake.body {
-			if i == len(g.board.snake.body)-1 {
-				snakeColor = snakeHeadColor
-			}
-			ebitenutil.DrawRect(screen, float64(p.x*width)+float64(width*1/20), float64(p.y*width)+float64(width*1/20), float64(width)*9/10, float64(width)*9/10, snakeColor)
-		}
-		g.board.DisplayScore(screen, g.board.scores)
-		var foodImg *ebiten.Image
-		var err error
-		if foodImg, _, err = ebitenutil.NewImageFromFile("./foods/apple.png"); err != nil {
-			log.Fatal(err)
-		}
-		op := &ebiten.DrawImageOptions{}
-		sx, sy := foodImg.Size()
-		propx := float64(width) / float64(sy)
-		propy := float64(width) / float64(sx)
-		op.GeoM.Scale(propx, propy)
-		op.GeoM.Translate(float64(g.board.food.x*width), float64(g.board.food.y*width))
-		screen.DrawImage(foodImg, op)
+		g.board.DisplaySnake(screen)                       // 画🐍身
+		g.board.DisplayFood(screen)                        // 画食物
+		g.board.DisplayScore(screen, g.board.scores, face) // 实时分数
 	}
 }
 

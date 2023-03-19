@@ -3,12 +3,14 @@ package snake
 import (
 	"fmt"
 	"image/color"
+	"log"
 	"math/rand"
 	"time"
 
-	"github.com/hajimehoshi/bitmapfont/v2"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text"
+	"golang.org/x/image/font"
 )
 
 type Board struct {
@@ -69,38 +71,64 @@ func (b *Board) Update(i *Input) error {
 }
 
 // DisplayStartScreen 在screen上展示游戏开始界面
-func (b *Board) DisplayStartScreen(screen *ebiten.Image) {
+func (b *Board) DisplayStartScreen(screen *ebiten.Image, face font.Face) {
 	text.Draw(
 		screen,
 		"Press the space key to start the game!\n",
-		bitmapfont.Face,
-		ScreenWidth/2-100, ScreenHeight/2,
+		face,
+		ScreenWidth/2-fontSize*8, ScreenHeight/2,
 		color.Black,
 	)
 }
 
 // DisplayScore 在screen上显示分数
-func (b *Board) DisplayScore(screen *ebiten.Image, score int) {
+func (b *Board) DisplayScore(screen *ebiten.Image, score int, face font.Face) {
 	text.Draw(
 		screen,
 		fmt.Sprintf("Score: %d", score),
-		bitmapfont.Face,
-		20, 20,
+		face,
+		0, fontSize,
 		color.Black,
 	)
 }
 
 // DisplayOverScreen 在screen上展示游结束界面
-func (b *Board) DisplayOverScreen(screen *ebiten.Image, score int) {
+func (b *Board) DisplayOverScreen(screen *ebiten.Image, score int, face font.Face) {
 	text.Draw(
 		screen,
 		fmt.Sprintf("Game Over. Score: %d\n", score)+
-			"Press R to restart the game.\n"+
-			"Press Q to exit the game\n",
-		bitmapfont.Face,
-		ScreenWidth/2-100, ScreenHeight/2,
+			"Press R to restart the game.\n",
+		face,
+		ScreenWidth/2-fontSize*8, ScreenHeight/2,
 		color.Black,
 	)
+}
+
+// DisplaySnake 画🐍
+func (b *Board) DisplaySnake(screen *ebiten.Image) {
+	snakeColor := snakeBodyColor
+	for i, p := range b.snake.body {
+		if i == len(b.snake.body)-1 {
+			snakeColor = snakeHeadColor
+		}
+		ebitenutil.DrawRect(screen, float64(p.x*coordWidth)+float64(coordWidth*1/20), float64(p.y*coordHeight)+float64(coordHeight*1/20), float64(coordWidth)*9/10, float64(coordHeight)*9/10, snakeColor)
+	}
+}
+
+// DisplayFood 画食物
+func (b *Board) DisplayFood(screen *ebiten.Image) {
+	var foodImg *ebiten.Image // 画食物
+	var err error
+	if foodImg, _, err = ebitenutil.NewImageFromFile("./asserts/apple.png"); err != nil {
+		log.Fatal(err)
+	}
+	op := &ebiten.DrawImageOptions{}
+	sx, sy := foodImg.Size()
+	propx := float64(coordWidth) / float64(sy)
+	propy := float64(coordHeight) / float64(sx)
+	op.GeoM.Scale(propx, propy)
+	op.GeoM.Translate(float64(b.food.x*coordWidth), float64(b.food.y*coordHeight))
+	screen.DrawImage(foodImg, op)
 }
 
 // placeFood 放置食物

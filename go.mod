@@ -10,6 +10,7 @@ require (
 require (
 	github.com/ebitengine/purego v0.0.0-20220905075623-aeed57cda744 // indirect
 	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20220806181222-55e207c401ad // indirect
+	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/hajimehoshi/file2byteslice v0.0.0-20210813153925-5340248a8f41 // indirect
 	github.com/jezek/xgb v1.0.1 // indirect
 	golang.org/x/exp v0.0.0-20200224162631-6cc2880d07d6 // indirect
