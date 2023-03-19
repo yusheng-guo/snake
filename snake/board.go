@@ -38,10 +38,18 @@ func NewBoard(rows, cols int) *Board {
 }
 
 func (b *Board) DrawGrid(screen *ebiten.Image) {
+	// 画点
+	// for x := 1; x < b.cols; x++ {
+	// 	for y := 1; y <= b.rows; y++ {
+	// 		ebitenutil.DrawRect(screen, float64(x*coordWidth), float64(y*coordHeight), float64(2), float64(2), color.Black)
+	// 	}
+	// }
+	// 画线
 	for x := 1; x < b.cols; x++ {
-		for y := 1; y <= b.rows; y++ {
-			ebitenutil.DrawRect(screen, float64(x*coordWidth), float64(y*coordHeight), float64(2), float64(2), color.Black)
-		}
+		ebitenutil.DrawLine(screen, float64(x*coordWidth), float64(0), float64(x*coordWidth), float64(ScreenHeight), color.RGBA{128, 128, 128, 255})
+	}
+	for y := 1; y < b.cols; y++ {
+		ebitenutil.DrawLine(screen, float64(0), float64(y*coordHeight), float64(ScreenWidth), float64(y*coordHeight), color.RGBA{128, 128, 128, 255})
 	}
 }
 
