@@ -57,6 +57,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.board.DisplaySnake(screen)                      // 画🐍身
 		g.board.DisplayFoods(screen)                      // 画食物
 		g.board.DisplayScore(screen, g.board.score, face) // 实时分数
+		g.board.DisplaySpentTime(screen, face)            // 用时
 	}
 }
 

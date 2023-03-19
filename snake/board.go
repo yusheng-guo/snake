@@ -22,6 +22,7 @@ type Board struct {
 	gameStart bool    // 游戏开始
 	gameOver  bool    // 游戏结束
 	timer     time.Time
+	startTime time.Time // 开始时间
 }
 
 // NewBoard 创建一个新的 Board
@@ -60,6 +61,7 @@ func (b *Board) Update(i *Input) error {
 	if ok := i.isPressSpace(); ok {
 		b.score = 0
 		b.gameStart = true
+		b.startTime = time.Now()
 	}
 	// 重新开始
 	if ok := i.isPressR(); ok {
@@ -106,12 +108,25 @@ func (b *Board) DisplayStartScreen(screen *ebiten.Image, face font.Face) {
 
 // DisplayScore 在screen上显示分数
 func (b *Board) DisplayScore(screen *ebiten.Image, score int, face font.Face) {
+	message := fmt.Sprintf("Score: %d", score)
 	text.Draw(
 		screen,
-		fmt.Sprintf("Score: %d", score),
+		message,
 		face,
-		0, fontSize,
-		color.Black,
+		ScreenWidth-150, 30,
+		color.RGBA{255, 0, 0, 255},
+	)
+}
+
+// DisplaySpentTime 在screen上显示用时
+func (b *Board) DisplaySpentTime(screen *ebiten.Image, face font.Face) {
+	message := fmt.Sprintf("Spent: %.0fs", time.Since(b.startTime).Seconds())
+	text.Draw(
+		screen,
+		message,
+		face,
+		ScreenWidth-150, 60,
+		color.RGBA{255, 0, 0, 255},
 	)
 }
 
