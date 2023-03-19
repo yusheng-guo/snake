@@ -1,6 +1,10 @@
 package snake
 
-import "github.com/hajimehoshi/ebiten/v2"
+import (
+	"log"
+
+	"github.com/hajimehoshi/ebiten/v2"
+)
 
 type Coord struct { // 组成射的每一个小方块
 	x, y int
@@ -10,14 +14,21 @@ type Snake struct {
 	body      []Coord    // 身体
 	direction ebiten.Key //方向
 	justEat   bool
+	sounds    map[string]*Sound // 声音
 }
 
 // NewSnake 创建🐍
 func NewSnake(body []Coord, direction ebiten.Key) *Snake {
-	return &Snake{
+	var err error
+	m := &Snake{
 		body:      body,
 		direction: direction,
 	}
+	m.sounds, err = LoadSounds()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return m
 }
 
 // Head 🐍头
@@ -82,4 +93,13 @@ func (s *Snake) Move() {
 	} else {
 		s.body = append(s.body[1:], newHead)
 	}
+}
+
+func (s *Snake) playSound(name string) error {
+	if s, ok := s.sounds[name]; ok {
+		if err := s.Play(); err != nil {
+			return err
+		}
+	}
+	return nil
 }

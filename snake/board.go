@@ -37,6 +37,14 @@ func NewBoard(rows, cols int) *Board {
 	return b
 }
 
+func (b *Board) DrawGrid(screen *ebiten.Image) {
+	for x := 1; x < b.cols; x++ {
+		for y := 1; y <= b.rows; y++ {
+			ebitenutil.DrawRect(screen, float64(x*coordWidth), float64(y*coordHeight), float64(2), float64(2), color.Black)
+		}
+	}
+}
+
 // Update 更新Board
 func (b *Board) Update(i *Input) error {
 	// 游戏开始
@@ -47,7 +55,7 @@ func (b *Board) Update(i *Input) error {
 	if ok := i.isPressR(); ok {
 		b.gameStart = false
 		b.gameOver = false
-		b.snake = NewSnake([]Coord{{0, 0}, {1, 0}, {2, 0}, {3, 0}}, ebiten.KeyArrowRight)
+		b.snake = NewSnake([]Coord{{-3, 0}, {-2, 0}, {-1, 0}, {0, 0}}, ebiten.KeyArrowRight)
 	}
 	// 游戏结束
 	if b.gameOver {
@@ -55,6 +63,9 @@ func (b *Board) Update(i *Input) error {
 	}
 	// 改变方向
 	if newDir, ok := i.Dir(); ok {
+		if wall, ok := b.snake.sounds["wall"]; ok { // 改变方向声音反馈
+			wall.Play()
+		}
 		b.snake.ChangeDirection(newDir)
 	}
 
@@ -147,12 +158,18 @@ func (b *Board) placeFood() {
 
 // moveSnake 移动🐍
 func (b *Board) moveSnake() error {
-	b.snake.Move() // 移动
-	if b.isTouchTheWall() || b.snake.HeadHitsBody() {
+	b.snake.Move()                                    // 移动
+	if b.isTouchTheWall() || b.snake.HeadHitsBody() { // 游戏结束
+		if score, ok := b.snake.sounds["score"]; ok { // 游戏结束音效
+			score.Play()
+		}
 		b.gameOver = true
 		return nil
 	}
 	if b.snake.HeadHits(b.food.x, b.food.y) {
+		if paddle, ok := b.snake.sounds["paddle"]; ok { // 吃到食物音效
+			paddle.Play()
+		}
 		b.snake.justEat = true // 是否吃到食物
 		b.placeFood()          // 放食物
 		b.scores++             // 分数

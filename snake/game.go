@@ -20,9 +20,9 @@ const (
 )
 
 var (
-	backgroundColor = color.RGBA{128, 128, 128, 255}
-	snakeHeadColor  = color.RGBA{255, 99, 71, 255}   // 🐍头颜色
-	snakeBodyColor  = color.RGBA{149, 236, 105, 255} // 🐍身颜色
+	backgroundColor = color.RGBA{83, 175, 74, 255}
+	snakeHeadColor  = color.RGBA{21, 21, 43, 255} // 🐍头颜色
+	snakeBodyColor  = color.RGBA{21, 21, 43, 255} // 🐍身颜色
 )
 
 type Game struct {
@@ -43,6 +43,7 @@ func (g *Game) Update() error {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(backgroundColor) // 填充背景
+	g.board.DrawGrid(screen)
 	// face, err := loadGoregularFont(fontSize) // Goregular字体
 	face, err := loadLocalFont("assets/Comic Sans MS.ttf", fontSize)
 	if err != nil {
