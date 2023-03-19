@@ -40,8 +40,9 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	screen.Fill(backgroundColor)    // 填充背景
-	face, err := loadFont(fontSize) // 字体
+	screen.Fill(backgroundColor) // 填充背景
+	// face, err := loadGoregularFont(fontSize) // Goregular字体
+	face, err := loadLocalFont("asserts\\Comic Sans MS.ttf", fontSize)
 	if err != nil {
 		log.Fatal(err)
 	}
