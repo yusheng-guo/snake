@@ -61,7 +61,7 @@ func (b *Board) Update(i *Input) error {
 
 	// 移动🐍身
 	interval := time.Millisecond * 200
-	if time.Since(b.timer) >= interval {
+	if b.gameStart && time.Since(b.timer) >= interval {
 		if err := b.moveSnake(); err != nil {
 			return err
 		}
