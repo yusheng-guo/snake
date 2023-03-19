@@ -3,7 +3,6 @@ package snake
 import (
 	"fmt"
 	"image/color"
-	"log"
 	"math/rand"
 	"time"
 
@@ -117,11 +116,7 @@ func (b *Board) DisplaySnake(screen *ebiten.Image) {
 
 // DisplayFood 画食物
 func (b *Board) DisplayFood(screen *ebiten.Image) {
-	var foodImg *ebiten.Image // 画食物
-	var err error
-	if foodImg, _, err = ebitenutil.NewImageFromFile("assets/apple.png"); err != nil {
-		log.Fatal(err)
-	}
+	foodImg := b.food.image
 	op := &ebiten.DrawImageOptions{}
 	sx, sy := foodImg.Size()
 	propx := float64(coordWidth) / float64(sy)

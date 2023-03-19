@@ -9,14 +9,22 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/audio/mp3"
 )
 
-const sampleRate = 48000
-
 type Music struct {
-	player *audio.Player
+	context *audio.Context
+	player  *audio.Player
+	on      bool
 }
 
-func NewMusic(name string) *Music {
-	audioContext := audio.NewContext(sampleRate)
+func NewMusic(sampleRate int) *Music {
+	m := &Music{
+		context: audio.NewContext(sampleRate),
+		player:  nil,
+		on:      true,
+	}
+	return m
+}
+
+func (m *Music) Play(name string) {
 	f, err := os.ReadFile(name)
 	if err != nil {
 		log.Fatal(err)
@@ -26,12 +34,9 @@ func NewMusic(name string) *Music {
 		log.Fatal(err)
 	}
 	// 创建循环
-	s := audio.NewInfiniteLoop(stream, stream.Length())
-	player, err := audioContext.NewPlayer(s)
+	// stream = audio.NewInfiniteLoop(stream, stream.Length())
+	m.player, err = m.context.NewPlayer(stream)
 	if err != nil {
 		log.Fatal(err)
-	}
-	return &Music{
-		player: player,
 	}
 }

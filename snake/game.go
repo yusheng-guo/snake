@@ -12,10 +12,11 @@ const (
 	ScreenHeight = 420
 	boardCols    = 20
 	boardRows    = 14
-	coordWidth   = ScreenWidth / boardCols                        // 每个小方块的宽度
-	coordHeight  = ScreenHeight / boardRows                       // 每个小方块的高度
-	fontSize     = 20                                             // 字体大小
-	name         = "assets/Lewis Capaldi - Someone You Loved.mp3" // 背景音乐
+	coordWidth   = ScreenWidth / boardCols       // 每个小方块的宽度
+	coordHeight  = ScreenHeight / boardRows      // 每个小方块的高度
+	fontSize     = 20                            // 字体大小
+	name         = "assets/background music.mp3" // 背景音乐
+	sampleRate   = 48000                         // 码率
 )
 
 var (
@@ -34,12 +35,18 @@ func NewGame() *Game {
 	return &Game{
 		input: NewInput(),
 		board: NewBoard(boardRows, boardCols),
-		music: NewMusic(name),
+		music: NewMusic(sampleRate),
 	}
 }
 
 func (g *Game) Update() error {
-	g.music.player.Play()
+	if g.music.on {
+		g.music.Play("assets/Lewis Capaldi - Someone You Loved.mp3")
+		g.music.on = false
+	}
+	if g.music.player != nil {
+		g.music.player.Play()
+	}
 	return g.board.Update(g.input)
 }
 
