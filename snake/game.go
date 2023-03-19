@@ -12,9 +12,10 @@ const (
 	ScreenHeight = 420
 	boardCols    = 20
 	boardRows    = 14
-	coordWidth   = ScreenWidth / boardCols  // 每个小方块的宽度
-	coordHeight  = ScreenHeight / boardRows // 每个小方块的高度
-	fontSize     = 20                       // 字体大小
+	coordWidth   = ScreenWidth / boardCols                        // 每个小方块的宽度
+	coordHeight  = ScreenHeight / boardRows                       // 每个小方块的高度
+	fontSize     = 20                                             // 字体大小
+	name         = "assets/Lewis Capaldi - Someone You Loved.mp3" // 背景音乐
 )
 
 var (
@@ -24,25 +25,28 @@ var (
 )
 
 type Game struct {
-	input *Input
-	board *Board
+	input *Input // 输入
+	board *Board // 背板
+	music *Music // 音乐
 }
 
 func NewGame() *Game {
 	return &Game{
 		input: NewInput(),
 		board: NewBoard(boardRows, boardCols),
+		music: NewMusic(name),
 	}
 }
 
 func (g *Game) Update() error {
+	g.music.player.Play()
 	return g.board.Update(g.input)
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(backgroundColor) // 填充背景
 	// face, err := loadGoregularFont(fontSize) // Goregular字体
-	face, err := loadLocalFont("asserts\\Comic Sans MS.ttf", fontSize)
+	face, err := loadLocalFont("assets/Comic Sans MS.ttf", fontSize)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -119,7 +119,7 @@ func (b *Board) DisplaySnake(screen *ebiten.Image) {
 func (b *Board) DisplayFood(screen *ebiten.Image) {
 	var foodImg *ebiten.Image // 画食物
 	var err error
-	if foodImg, _, err = ebitenutil.NewImageFromFile("./asserts/apple.png"); err != nil {
+	if foodImg, _, err = ebitenutil.NewImageFromFile("assets/apple.png"); err != nil {
 		log.Fatal(err)
 	}
 	op := &ebiten.DrawImageOptions{}
