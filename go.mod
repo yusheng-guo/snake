@@ -10,7 +10,7 @@ require (
 
 require (
 	github.com/ebitengine/purego v0.0.0-20220905075623-aeed57cda744 // indirect
-	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20220806181222-55e207c401ad // indirect
+	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20221017161538-93cebf72946b // indirect
 	github.com/hajimehoshi/bitmapfont/v2 v2.2.3 // indirect
 	github.com/hajimehoshi/file2byteslice v0.0.0-20210813153925-5340248a8f41 // indirect
 	github.com/hajimehoshi/go-mp3 v0.3.3 // indirect

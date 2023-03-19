@@ -28,7 +28,7 @@ func getRandFoodImage() *ebiten.Image {
 	if err != nil {
 		log.Fatal(err)
 	}
-	img, _, err := ebitenutil.NewImageFromFile("./assets/foods/" + dirs[rand.Intn(len(dirs))].Name())
+	img, _, err := ebitenutil.NewImageFromFile("assets/foods/" + dirs[rand.Intn(len(dirs))].Name())
 	if err != nil {
 		log.Fatal(err)
 	}

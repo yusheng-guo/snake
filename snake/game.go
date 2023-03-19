@@ -28,25 +28,16 @@ var (
 type Game struct {
 	input *Input // 输入
 	board *Board // 背板
-	music *Music // 音乐
 }
 
 func NewGame() *Game {
 	return &Game{
 		input: NewInput(),
 		board: NewBoard(boardRows, boardCols),
-		music: NewMusic(sampleRate),
 	}
 }
 
 func (g *Game) Update() error {
-	if g.music.on {
-		g.music.Play("assets/Lewis Capaldi - Someone You Loved.mp3")
-		g.music.on = false
-	}
-	if g.music.player != nil {
-		g.music.player.Play()
-	}
 	return g.board.Update(g.input)
 }
 
