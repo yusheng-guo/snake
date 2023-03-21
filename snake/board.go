@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image/color"
 	"math/rand"
+	"strconv"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -23,6 +24,7 @@ type Board struct {
 	gameOver  bool    // 游戏结束
 	timer     time.Time
 	startTime time.Time // 开始时间
+	save      *Save     // 保存分数
 }
 
 // NewBoard 创建一个新的 Board
@@ -33,6 +35,7 @@ func NewBoard(rows, cols int) *Board {
 		timer:     time.Now(),
 		gameStart: false,
 		gameOver:  false,
+		save:      NewSave(),
 	}
 	b.snake = NewSnake([]Coord{{0, 0}, {1, 0}, {2, 0}, {3, 0}}, ebiten.KeyArrowRight)
 	b.placeFoods(5) // 放食物
@@ -59,6 +62,9 @@ func (b *Board) DrawGrid(screen *ebiten.Image) {
 func (b *Board) Update(i *Input) error {
 	// 游戏开始
 	if ok := i.isPressSpace(); ok {
+		if b.score != 0 {
+			b.save.StoreScore(b.score)
+		}
 		b.score = 0
 		b.gameStart = true
 		b.startTime = time.Now()
@@ -132,7 +138,7 @@ func (b *Board) DisplaySpentTime(screen *ebiten.Image, face font.Face) {
 
 // DisplayOverScreen 在screen上展示游结束界面
 func (b *Board) DisplayOverScreen(screen *ebiten.Image, score int, face font.Face) {
-	message := "Game Over.\n" + fmt.Sprintf("Score: %d\n", score) + "Press R to restart the game.\n"
+	message := "Game Over.\n" + fmt.Sprintf("Score: %d\n", score) + "Max Score: " + strconv.Itoa(b.save.HighestScore()) + "\n" + "Press R to restart the game.\n"
 	size := text.BoundString(face, message)
 	messageWidth, messageHeight := size.Max.X-size.Min.X, size.Max.Y-size.Min.Y
 	text.Draw(
