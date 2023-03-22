@@ -3,6 +3,7 @@ package snake
 import (
 	"image/color"
 	"log"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -26,38 +27,86 @@ var (
 )
 
 type Game struct {
-	input *Input // 输入
-	board *Board // 背板
+	input            *Input    // 输入
+	board            *Board    // 背板
+	score            *Score    // 分数
+	isGameOver       bool      // 游戏是否结束界面
+	isGameStart      bool      // 游戏是否开始界面
+	isGameInProgress bool      // 游戏是否正在进行
+	startTime        time.Time // 游戏开始时间
 }
 
 func NewGame() *Game {
 	return &Game{
-		input: NewInput(),
-		board: NewBoard(boardRows, boardCols),
+		input:       NewInput(),
+		score:       NewScore(),
+		board:       NewBoard(boardRows, boardCols),
+		isGameStart: true,
 	}
 }
 
 func (g *Game) Update() error {
-	return g.board.Update(g.input)
+	var err error
+	// 重新开始
+	if ok := g.isGameOver && g.input.isPressR(); ok {
+		g.board = NewBoard(boardRows, boardCols)
+		g.isGameStart = true
+		g.isGameInProgress = false
+		g.isGameOver = false
+	}
+	// 游戏结束
+	if g.isGameOver {
+		return nil
+	}
+	// 更新状态 isGameOver, isGameStart, isGameInProgress
+	// 游戏开始
+	if ok := g.isGameStart && g.input.isPressSpace(); ok {
+		if g.score.score != 0 {
+			g.score.Save()
+		}
+		g.score.score = 0
+		g.isGameStart = false
+		g.isGameInProgress = true
+		g.isGameOver = false
+		g.startTime = time.Now()
+	}
+
+	if g.isGameInProgress { // 更新游戏进行时
+		// 改变方向
+		if newDir, ok := g.input.Dir(); ok {
+			g.board.snake.ChangeDirection(newDir)
+		}
+		// 移动🐍身
+		interval := time.Millisecond * 200
+		if time.Since(g.board.timer) >= interval {
+			if err := g.board.MoveSnake(g); err != nil {
+				return err
+			}
+			g.board.timer = time.Now()
+		}
+	}
+	return err
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(backgroundColor) // 填充背景
 	g.board.DrawGrid(screen)
 	// face, err := loadGoregularFont(fontSize) // Goregular字体
-	face, err := loadLocalFont("assets/Comic Sans MS.ttf", fontSize)
+	face, err := loadLocalFont(fontSize)
 	if err != nil {
 		log.Fatal(err)
 	}
-	if !g.board.gameStart { // 游戏开始界面
+	if g.isGameStart { // 游戏开始界面
 		g.board.DisplayStartScreen(screen, face)
-	} else if g.board.gameOver { // 游戏结束 显示分数
-		g.board.DisplayOverScreen(screen, g.board.score, face)
-	} else {
-		g.board.DisplaySnake(screen)                      // 画🐍身
-		g.board.DisplayFoods(screen)                      // 画食物
-		g.board.DisplayScore(screen, g.board.score, face) // 实时分数
-		g.board.DisplaySpentTime(screen, face)            // 用时
+	}
+	if g.isGameOver { // 游戏结束 显示分数
+		g.board.DisplayOverScreen(screen, g.score.score, g.score.HighestScore(), face)
+	}
+	if g.isGameInProgress {
+		g.board.DisplaySnake(screen)                        // 画🐍身
+		g.board.DisplayFoods(screen)                        // 画食物
+		g.board.DisplayScore(screen, g.score.score, face)   // 实时分数
+		g.board.DisplaySpentTime(screen, g.startTime, face) // 用时
 	}
 }
 

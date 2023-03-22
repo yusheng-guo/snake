@@ -6,10 +6,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-type Coord struct { // 组成射的每一个小方块
-	x, y int
-}
-
 type Snake struct {
 	body      []Coord    // 身体
 	direction ebiten.Key //方向
@@ -53,9 +49,9 @@ func (s *Snake) ChangeDirection(newDir ebiten.Key) {
 // 碰撞检测
 // HeadHits 检测🐍头是否在(x, y)
 // 是否吃到食物
-func (s *Snake) HeadHits(x, y int) bool {
+func (s *Snake) HeadHits(pos Coord) bool {
 	head := s.Head()
-	return head.x == x && head.y == y
+	return head.x == pos.x && head.y == pos.y
 }
 
 // HeadHits 检测🐍头是否碰撞🐍身
@@ -64,6 +60,7 @@ func (s *Snake) HeadHitsBody() bool {
 	bodyWithoutHead := s.body[:len(s.body)-1]
 	for _, b := range bodyWithoutHead {
 		if b.x == head.x && b.y == head.y {
+			s.playSound("over")
 			return true
 		}
 	}
@@ -95,11 +92,10 @@ func (s *Snake) Move() {
 	}
 }
 
-func (s *Snake) playSound(name string) error {
+func (s *Snake) playSound(name string) {
 	if s, ok := s.sounds[name]; ok {
 		if err := s.Play(); err != nil {
-			return err
+			log.Fatal(err)
 		}
 	}
-	return nil
 }

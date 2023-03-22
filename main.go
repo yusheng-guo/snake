@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	_ "embed"
 	"image"
 	"log"
 	"os"
@@ -10,17 +12,20 @@ import (
 	"github.com/yushengguo557/snake/snake"
 )
 
+//go:embed .\assets\icon.png
+var icon []byte
+
 func main() {
 	os.Setenv("CGO_ENABLED", "1")
 	game := snake.NewGame()
 	ebiten.SetWindowSize(snake.ScreenWidth, snake.ScreenHeight)
 	ebiten.SetWindowTitle("Snake")
-	var icon image.Image
-	var err error
-	if _, icon, err = ebitenutil.NewImageFromFile("assets/icon.png"); err != nil {
+	reader := bytes.NewReader(icon)
+	img, _, err := ebitenutil.NewImageFromReader(reader)
+	if err != nil {
 		log.Fatal(err)
 	}
-	ebiten.SetWindowIcon([]image.Image{icon})
+	ebiten.SetWindowIcon([]image.Image{img})
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
 	}

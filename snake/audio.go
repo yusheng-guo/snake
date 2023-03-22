@@ -8,20 +8,17 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
 )
 
-//go:embed ..\assets\audios\paddle.ogg
-var paddleOgg []byte
+//go:embed ..\assets\audios\over.ogg
+var overOgg []byte
 
 //go:embed ..\assets\audios\score.ogg
 var scoreOgg []byte
-
-//go:embed ..\assets\audios\wall.ogg
-var wallOgg []byte
 
 type Sound struct {
 	player *audio.Player
 }
 
-// 初始化 audio Context
+// 初始化 audio Context 每个游戏只能有一个 Context
 var audioContext = audio.NewContext(44100)
 
 // Play 播放音乐
@@ -56,7 +53,6 @@ func LoadSounds() (map[string]*Sound, error) {
 }
 
 var soundFiles = map[string][]byte{
-	"wall":   wallOgg,
-	"paddle": paddleOgg,
-	"score":  scoreOgg,
+	"score": scoreOgg,
+	"over":  overOgg,
 }
