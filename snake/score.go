@@ -15,11 +15,8 @@ type Score struct {
 }
 
 func NewScore() *Score {
-	// 创建 data文件夹
-	err := os.Mkdir("data", os.ModePerm)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// 创建 data文件夹 并忽略返回值err
+	os.Mkdir("data", os.ModePerm)
 	// 打开 SQLite 数据库文件
 	db, err := sql.Open("sqlite3", "data\\score.db")
 	if err != nil {
